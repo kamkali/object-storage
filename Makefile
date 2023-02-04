@@ -1,13 +1,11 @@
 build-container:
-	docker build -t filequeue:latest .
+	docker build -t object-storage:latest .
 
 run-container:
-	docker run -it --name corti filequeue:latest
+	docker run -it --name object-storage object-storage:latest
 
-tools: install-mockery
-
-install-mockery:
-	go install github.com/vektra/mockery/v2@latest
+tools:
+	cat tools.go | grep _ | grep \".*\" -o | xargs -tI % go install %
 
 generate:
 	go generate ./...
@@ -18,4 +16,12 @@ test:
 lint:
 	golangci-lint run ./...
 
-.PHONY: build-container run-container tools generate lint
+fmt-code:
+	gofmt -w .
+
+fmt-imports:
+	goimports -w .
+
+format: fmt-code fmt-imports
+
+.PHONY: build-container run-container tools generate lint format
