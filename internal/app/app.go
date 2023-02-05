@@ -1,6 +1,8 @@
 package app
 
 import (
+	"github.com/kamkalis/object-storage/internal/domain"
+	"github.com/kamkalis/object-storage/internal/domain/service"
 	"log"
 
 	"github.com/kamkalis/object-storage/internal/config"
@@ -8,8 +10,9 @@ import (
 )
 
 type app struct {
-	config *config.Config
-	server *server.Server
+	config         *config.Config
+	server         *server.Server
+	storageService domain.StorageService
 }
 
 func (a *app) initConfig() {
@@ -22,11 +25,12 @@ func (a *app) initConfig() {
 
 func (a *app) initApp() {
 	a.initConfig()
+	a.initStorage()
 	a.initHTTPServer()
 }
 
 func (a *app) initHTTPServer() {
-	s, err := server.New(a.config)
+	s, err := server.New(a.config, a.storageService)
 	if err != nil {
 		log.Fatalf("cannot init server: %v\n", err)
 	}
@@ -35,6 +39,10 @@ func (a *app) initHTTPServer() {
 
 func (a *app) start() {
 	a.server.Start()
+}
+
+func (a *app) initStorage() {
+	a.storageService = service.NewStorage()
 }
 
 func Run() {

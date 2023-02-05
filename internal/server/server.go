@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kamkalis/object-storage/internal/domain"
 	"log"
 	"net"
 	"net/http"
@@ -21,9 +22,11 @@ type Server struct {
 	router     *mux.Router
 	config     *config.Config
 	httpServer *http.Server
+
+	storageService domain.StorageService
 }
 
-func New(cfg *config.Config) (*Server, error) {
+func New(cfg *config.Config, storageService domain.StorageService) (*Server, error) {
 	r := mux.NewRouter()
 	s := &Server{
 		router: r,
@@ -32,6 +35,7 @@ func New(cfg *config.Config) (*Server, error) {
 			Addr:    net.JoinHostPort(cfg.Server.Host, cfg.Server.Port),
 			Handler: r,
 		},
+		storageService: storageService,
 	}
 
 	s.registerRoutes()
@@ -39,7 +43,15 @@ func New(cfg *config.Config) (*Server, error) {
 	return s, nil
 }
 
-func (s *Server) registerRoutes() {}
+func (s *Server) registerRoutes() {
+	s.router.Handle("/object/{id}",
+		s.withTimeout(s.config.Server.TimeoutSeconds, s.putObjectHandler()),
+	).Methods(http.MethodPut)
+
+	s.router.Handle("/object/{id}",
+		s.withTimeout(s.config.Server.TimeoutSeconds, s.getObjectHandler()),
+	).Methods(http.MethodGet)
+}
 
 func (s *Server) Start() {
 	done := make(chan os.Signal, 1)
@@ -67,10 +79,9 @@ func (s *Server) Start() {
 }
 
 func (s *Server) writeErrResponse(w http.ResponseWriter, err error, code int, desc string) {
-	log.Println(fmt.Errorf("error response: %w", err).Error())
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	jsonErr, err := json.Marshal(schema.ServerError{Description: desc})
+	jsonErr, err := json.Marshal(schema.ServerError{Error: desc})
 	if err != nil {
 		return
 	}
