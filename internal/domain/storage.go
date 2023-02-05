@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"io"
 
 	"github.com/google/uuid"
 	"golang.org/x/net/context"
@@ -28,9 +29,9 @@ type StorageNode interface {
 //go:generate mockery --name=StorageNode
 
 type Object struct {
-	ID uuid.UUID
-	// TODO: think about io.Writer
-	Content []byte
+	ID      uuid.UUID
+	Content io.Reader
+	Size    int
 }
 
 type StorageService interface {
