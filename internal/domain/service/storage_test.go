@@ -2,12 +2,13 @@ package service
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/google/uuid"
 	"github.com/kamkalis/object-storage/internal/domain"
 	"github.com/kamkalis/object-storage/internal/domain/mocks"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
-	"testing"
 )
 
 var _ domain.StorageService = (*StorageService)(nil)

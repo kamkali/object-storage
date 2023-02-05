@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+
 	"github.com/google/uuid"
 	"golang.org/x/net/context"
 )
@@ -10,7 +11,7 @@ var (
 	ErrObjNotFound = errors.New("object not found")
 )
 
-type StorageManager interface {
+type NodeManager interface {
 	SelectNode(ctx context.Context, objectID uuid.UUID) (StorageNode, error)
 }
 
@@ -37,3 +38,8 @@ type StorageService interface {
 }
 
 //go:generate mockery --name=StorageService
+
+type NodeDiscoverer interface {
+}
+
+//go:generate mockery --name=NodeDiscoverer
