@@ -78,7 +78,7 @@ func (s *Server) Start() {
 	log.Println("Server Exited Properly")
 }
 
-func (s *Server) writeErrResponse(w http.ResponseWriter, err error, code int, desc string) {
+func (s *Server) writeErrResponse(w http.ResponseWriter, code int, desc string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	jsonErr, err := json.Marshal(schema.ServerError{Error: desc})

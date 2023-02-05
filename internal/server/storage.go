@@ -19,13 +19,13 @@ func (s *Server) putObjectHandler() http.HandlerFunc {
 
         objectID, err := uuid.Parse(vars["id"])
         if err != nil {
-            s.writeErrResponse(w, err, http.StatusBadRequest, schema.ErrBadRequest)
+            s.writeErrResponse(w,  http.StatusBadRequest, schema.ErrBadRequest)
             return
         }
 
         body, err := io.ReadAll(r.Body)
         if err != nil || r.Body == http.NoBody {
-            s.writeErrResponse(w, err, http.StatusBadRequest, schema.ErrBadRequest)
+            s.writeErrResponse(w,  http.StatusBadRequest, schema.ErrBadRequest)
             return
         }
 
@@ -33,7 +33,7 @@ func (s *Server) putObjectHandler() http.HandlerFunc {
             ID:      objectID,
             Content: body,
         }); err != nil {
-            s.writeErrResponse(w, err, http.StatusInternalServerError, schema.ErrInternal)
+            s.writeErrResponse(w,  http.StatusInternalServerError, schema.ErrInternal)
             return
         }
 
@@ -48,17 +48,17 @@ func (s *Server) getObjectHandler() http.HandlerFunc {
 
         objectID, err := uuid.Parse(vars["id"])
         if err != nil {
-            s.writeErrResponse(w, err, http.StatusBadRequest, schema.ErrBadRequest)
+            s.writeErrResponse(w,  http.StatusBadRequest, schema.ErrBadRequest)
             return
         }
 
         object, err := s.storageService.GetObject(ctx, objectID)
         if err != nil {
             if errors.Is(err, domain.ErrObjNotFound) {
-                s.writeErrResponse(w, err, http.StatusNotFound, schema.ErrNotFound)
+                s.writeErrResponse(w,  http.StatusNotFound, schema.ErrNotFound)
                 return
             }
-            s.writeErrResponse(w, err, http.StatusInternalServerError, schema.ErrInternal)
+            s.writeErrResponse(w,  http.StatusInternalServerError, schema.ErrInternal)
             return
         }
 
