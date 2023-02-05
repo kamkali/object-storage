@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/kamkalis/object-storage/internal/domain"
 	"log"
 	"net"
 	"net/http"
@@ -11,6 +10,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/kamkalis/object-storage/internal/domain"
 
 	"github.com/gorilla/mux"
 	"github.com/kamkalis/object-storage/internal/config"
