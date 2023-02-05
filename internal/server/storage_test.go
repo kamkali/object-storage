@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
@@ -39,7 +40,8 @@ func TestPutObjectHandler(t *testing.T) {
 			prepFunc: func(s *mocks.StorageService, a args) {
 				s.On("PutObject", mock.Anything, &domain.Object{
 					ID:      uuid.MustParse(a.id),
-					Content: []byte("object body"),
+					Content: bytes.NewBuffer([]byte("object body")),
+					Size:    11,
 				}).Return(nil)
 			},
 			wantCode: http.StatusCreated,
@@ -117,7 +119,8 @@ func TestGetObjectHandler(t *testing.T) {
 				s.On("GetObject", mock.Anything, uuid.MustParse(a.id)).
 					Return(&domain.Object{
 						ID:      uuid.MustParse(a.id),
-						Content: []byte("object body"),
+						Content: bytes.NewBuffer([]byte("object body")),
+						Size:    11,
 					}, nil)
 			},
 			want: resp{

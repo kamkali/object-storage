@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
@@ -35,7 +36,7 @@ func TestStorageService_PutObject(t *testing.T) {
 				ctx: ctx,
 				o: &domain.Object{
 					ID:      uuid.New(),
-					Content: []byte("content"),
+					Content: bytes.NewReader([]byte("content")),
 				},
 			},
 			prepFunc: func(d *mockDeps, a args) {
@@ -55,7 +56,7 @@ func TestStorageService_PutObject(t *testing.T) {
 				ctx: ctx,
 				o: &domain.Object{
 					ID:      uuid.New(),
-					Content: []byte("content"),
+					Content: bytes.NewReader([]byte("content")),
 				},
 			},
 			prepFunc: func(d *mockDeps, a args) {
@@ -71,7 +72,7 @@ func TestStorageService_PutObject(t *testing.T) {
 				ctx: ctx,
 				o: &domain.Object{
 					ID:      uuid.New(),
-					Content: []byte("content"),
+					Content: bytes.NewReader([]byte("content")),
 				},
 			},
 			prepFunc: func(d *mockDeps, a args) {
@@ -109,7 +110,7 @@ func TestStorageService_GetObject(t *testing.T) {
 	ctx := context.Background()
 	expected := &domain.Object{
 		ID:      uuid.New(),
-		Content: []byte("object"),
+		Content: bytes.NewReader([]byte("content")),
 	}
 	type mockDeps struct {
 		manager *mocks.StorageManager

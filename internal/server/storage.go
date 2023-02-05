@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -24,15 +25,16 @@ func (s *Server) putObjectHandler() http.HandlerFunc {
 			return
 		}
 
-		body, err := io.ReadAll(r.Body)
-		if err != nil || r.Body == http.NoBody {
+		var buf bytes.Buffer
+		if _, err := io.Copy(&buf, r.Body); err != nil || r.Body == http.NoBody {
 			s.writeErrResponse(w, http.StatusBadRequest, schema.ErrBadRequest)
 			return
 		}
 
 		if err := s.storageService.PutObject(ctx, &domain.Object{
 			ID:      objectID,
-			Content: body,
+			Content: &buf,
+			Size:    buf.Len(),
 		}); err != nil {
 			s.writeErrResponse(w, http.StatusInternalServerError, schema.ErrInternal)
 			return
@@ -64,8 +66,7 @@ func (s *Server) getObjectHandler() http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		_, err = w.Write(object.Content)
-		if err != nil {
+		if _, err := io.Copy(w, object.Content); err != nil {
 			log.Println(fmt.Errorf("cannot write object response: %w", err))
 			return
 		}
