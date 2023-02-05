@@ -53,6 +53,22 @@ func (_m *StorageNode) GetObject(ctx context.Context, id uuid.UUID) (*domain.Obj
 	return r0, r1
 }
 
+// ID provides a mock function with given fields:
+func (_m *StorageNode) ID() uuid.UUID {
+	ret := _m.Called()
+
+	var r0 uuid.UUID
+	if rf, ok := ret.Get(0).(func() uuid.UUID); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+
+	return r0
+}
+
 // IsAlive provides a mock function with given fields: ctx
 func (_m *StorageNode) IsAlive(ctx context.Context) bool {
 	ret := _m.Called(ctx)
