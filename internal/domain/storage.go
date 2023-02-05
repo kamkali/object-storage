@@ -1,34 +1,39 @@
 package domain
 
 import (
-    "errors"
-    "github.com/google/uuid"
-    "golang.org/x/net/context"
+	"errors"
+	"github.com/google/uuid"
+	"golang.org/x/net/context"
 )
 
 var (
-    ErrObjNotFound = errors.New("object not found")
+	ErrObjNotFound = errors.New("object not found")
 )
 
 type StorageManager interface {
+	SelectNode(ctx context.Context, objectID uuid.UUID) (StorageNode, error)
 }
 
 //go:generate mockery --name=StorageManager
 
-type StorageServer interface {
+type StorageNode interface {
+	Addr(ctx context.Context) string
+	IsAlive(ctx context.Context) bool
+	PutObject(ctx context.Context, o *Object) error
+	GetObject(ctx context.Context, id uuid.UUID) (*Object, error)
 }
 
-//go:generate mockery --name=StorageServer
+//go:generate mockery --name=StorageNode
 
 type Object struct {
-    ID uuid.UUID
-    // TODO: think about io.Writer
-    Content []byte
+	ID uuid.UUID
+	// TODO: think about io.Writer
+	Content []byte
 }
 
 type StorageService interface {
-    PutObject(ctx context.Context, o *Object) error
-    GetObject(ctx context.Context, id uuid.UUID) (*Object, error)
+	PutObject(ctx context.Context, o *Object) error
+	GetObject(ctx context.Context, id uuid.UUID) (*Object, error)
 }
 
 //go:generate mockery --name=StorageService
