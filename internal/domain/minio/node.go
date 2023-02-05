@@ -9,14 +9,17 @@ import (
 	"golang.org/x/net/context"
 )
 
-type Node struct {
-	id         uuid.UUID
-	bucketName string
+const (
+	bucketName = "to-the-moon"
+	// TODO: can be dynamic perhaps
+)
 
-	c *minio.Client
+type Node struct {
+	id uuid.UUID
+	c  *minio.Client
 }
 
-func NewNode(endpoint string, accessKeyID string, secretAccessKey string, bucketName string) (*Node, error) {
+func NewNode(endpoint string, accessKeyID string, secretAccessKey string) (*Node, error) {
 	// TODO: should I create new client for each node?
 	minioClient, err := minio.New(endpoint, &minio.Options{
 		Creds: credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
@@ -25,7 +28,10 @@ func NewNode(endpoint string, accessKeyID string, secretAccessKey string, bucket
 		return nil, fmt.Errorf("new minio node: %w", err)
 	}
 
-	return &Node{id: uuid.New(), bucketName: bucketName, c: minioClient}, nil
+	return &Node{
+		id: uuid.New(),
+		c:  minioClient,
+	}, nil
 }
 
 func (m *Node) ID() uuid.UUID {
@@ -41,7 +47,7 @@ func (m *Node) IsAlive(ctx context.Context) bool {
 }
 
 func (m *Node) PutObject(ctx context.Context, o *domain.Object) error {
-	_, err := m.c.PutObject(ctx, m.bucketName, o.ID.String(), o.Content, int64(o.Size), minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err := m.c.PutObject(ctx, bucketName, o.ID.String(), o.Content, int64(o.Size), minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		return fmt.Errorf("put object=%s to minio: %w", o.ID.String(), err)
 	}
@@ -49,7 +55,7 @@ func (m *Node) PutObject(ctx context.Context, o *domain.Object) error {
 }
 
 func (m *Node) GetObject(ctx context.Context, id uuid.UUID) (*domain.Object, error) {
-	object, err := m.c.GetObject(ctx, m.bucketName, id.String(), minio.GetObjectOptions{})
+	object, err := m.c.GetObject(ctx, bucketName, id.String(), minio.GetObjectOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("get object=%s from minio: %w", id.String(), err)
 	}
