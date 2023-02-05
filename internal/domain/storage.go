@@ -14,6 +14,7 @@ var (
 
 type NodeManager interface {
 	SelectNode(ctx context.Context, objectID uuid.UUID) (StorageNode, error)
+	// TODO: maybe compose with NodeDiscoverer
 }
 
 //go:generate mockery --name=NodeManager
@@ -42,6 +43,7 @@ type StorageService interface {
 //go:generate mockery --name=StorageService
 
 type NodeDiscoverer interface {
+	DiscoverNodes(ctx context.Context) ([]StorageNode, error)
 }
 
 //go:generate mockery --name=NodeDiscoverer
