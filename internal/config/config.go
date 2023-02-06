@@ -20,7 +20,7 @@ type Config struct {
 	}
 
 	Discovery struct {
-		RefreshDuration time.Duration `envconfig:"DISCOVERY_REFRESH" default:"1s"`
+		RefreshDuration time.Duration `envconfig:"DISCOVERY_REFRESH" default:"30s"`
 	}
 }
 
