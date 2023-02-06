@@ -32,9 +32,10 @@ func (s *Server) putObjectHandler() http.HandlerFunc {
 		}
 
 		if err := s.storageService.PutObject(ctx, &domain.Object{
-			ID:      objectID,
-			Content: &buf,
-			Size:    buf.Len(),
+			ID:          objectID,
+			Content:     &buf,
+			ContentType: r.Header.Get("Content-Type"),
+			Size:        r.ContentLength,
 		}); err != nil {
 			s.writeErrResponse(w, http.StatusInternalServerError, schema.ErrInternal)
 			return

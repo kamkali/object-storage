@@ -7,3 +7,5 @@ RUN go build ./cmd/object-gateway
 FROM docker
 COPY --from=0 /mnt/homework/object-gateway /usr/local/bin/homework-object-storage
 RUN apk add bash curl
+
+ENTRYPOINT ["homework-object-storage"]

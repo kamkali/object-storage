@@ -46,11 +46,11 @@ func New(cfg *config.Config, storageService domain.StorageService) (*Server, err
 
 func (s *Server) registerRoutes() {
 	s.router.Handle("/object/{id}",
-		s.withTimeout(s.config.Server.TimeoutSeconds, s.putObjectHandler()),
+		s.withTimeout(s.config.Server.Timeout, s.putObjectHandler()),
 	).Methods(http.MethodPut)
 
 	s.router.Handle("/object/{id}",
-		s.withTimeout(s.config.Server.TimeoutSeconds, s.getObjectHandler()),
+		s.withTimeout(s.config.Server.Timeout, s.getObjectHandler()),
 	).Methods(http.MethodGet)
 }
 

@@ -1,7 +1,13 @@
 package app
 
 import (
+	"context"
 	"log"
+	"time"
+
+	consistenthash "github.com/kamkalis/object-storage/internal/domain/consistent-hash"
+	"github.com/kamkalis/object-storage/internal/domain/docker"
+	"github.com/kamkalis/object-storage/internal/domain/manager"
 
 	"github.com/kamkalis/object-storage/internal/domain"
 	"github.com/kamkalis/object-storage/internal/domain/service"
@@ -27,7 +33,8 @@ func (a *app) initConfig() {
 
 func (a *app) initApp() {
 	a.initConfig()
-	a.initStorage()
+	a.initManager()
+	a.initStorageService()
 	a.initHTTPServer()
 }
 
@@ -40,11 +47,44 @@ func (a *app) initHTTPServer() {
 }
 
 func (a *app) start() {
+	ctx := context.Background()
+	err := a.manager.RefreshNodes(ctx)
+	if err != nil {
+		log.Fatalf("failed initial node refresh: %v", err)
+	}
+	go a.refreshJob(ctx, time.NewTicker(a.config.Discovery.RefreshDuration))
 	a.server.Start()
 }
 
-func (a *app) initStorage() {
+func (a *app) initStorageService() {
 	a.storageService = service.NewStorage(a.manager)
+}
+
+func (a *app) initManager() {
+	lb := consistenthash.NewRingLoadBalancer()
+	discoverer, err := docker.NewNodeDiscoverer(
+		a.config.StorageCluster.NodeIdentifier,
+		a.config.StorageCluster.NodeAPIPort,
+		a.config.StorageCluster.NetworkIdentifier,
+	)
+	if err != nil {
+		log.Fatalf("cannot init node discoverer: %v", err)
+	}
+	a.manager = manager.NewStorageManager(lb, discoverer)
+}
+
+func (a *app) refreshJob(ctx context.Context, ticker *time.Ticker) {
+	for {
+		select {
+		case <-ticker.C:
+			if err := a.manager.RefreshNodes(ctx); err != nil {
+				log.Printf("failed to refresh nodes in background: %v\n", err)
+			}
+		case <-ctx.Done():
+			log.Printf("ctx done: %v", ctx.Err())
+			return
+		}
+	}
 }
 
 func Run() {

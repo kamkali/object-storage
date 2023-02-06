@@ -12,9 +12,16 @@ var (
 	ErrObjNotFound = errors.New("object not found")
 )
 
+type NodeDiscoverer interface {
+	DiscoverNodes(ctx context.Context) ([]StorageNode, error)
+}
+
+//go:generate mockery --name=NodeDiscoverer
+
 type NodeManager interface {
-	SelectNode(ctx context.Context, objectID uuid.UUID) (StorageNode, error)
-	// TODO: maybe compose with NodeDiscoverer
+	NodeDiscoverer
+	LoadBalancer
+	RefreshNodes(ctx context.Context) error
 }
 
 //go:generate mockery --name=NodeManager
@@ -30,9 +37,10 @@ type StorageNode interface {
 //go:generate mockery --name=StorageNode
 
 type Object struct {
-	ID      uuid.UUID
-	Content io.Reader
-	Size    int
+	ID          uuid.UUID
+	Content     io.Reader
+	ContentType string
+	Size        int64
 }
 
 type StorageService interface {
@@ -41,9 +49,3 @@ type StorageService interface {
 }
 
 //go:generate mockery --name=StorageService
-
-type NodeDiscoverer interface {
-	DiscoverNodes(ctx context.Context) ([]StorageNode, error)
-}
-
-//go:generate mockery --name=NodeDiscoverer
