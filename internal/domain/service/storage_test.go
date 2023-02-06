@@ -17,7 +17,7 @@ var _ domain.StorageService = (*StorageService)(nil)
 func TestStorageService_PutObject(t *testing.T) {
 	ctx := context.Background()
 	type mockDeps struct {
-		manager *mocks.StorageManager
+		manager *mocks.NodeManager
 		node    *mocks.StorageNode
 	}
 	type args struct {
@@ -91,7 +91,7 @@ func TestStorageService_PutObject(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			deps := &mockDeps{
-				manager: mocks.NewStorageManager(t),
+				manager: mocks.NewNodeManager(t),
 				node:    mocks.NewStorageNode(t),
 			}
 			if tt.prepFunc != nil {
@@ -113,7 +113,7 @@ func TestStorageService_GetObject(t *testing.T) {
 		Content: bytes.NewReader([]byte("content")),
 	}
 	type mockDeps struct {
-		manager *mocks.StorageManager
+		manager *mocks.NodeManager
 		node    *mocks.StorageNode
 	}
 	type args struct {
@@ -180,7 +180,7 @@ func TestStorageService_GetObject(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			deps := &mockDeps{
-				manager: mocks.NewStorageManager(t),
+				manager: mocks.NewNodeManager(t),
 				node:    mocks.NewStorageNode(t),
 			}
 			if tt.prepFunc != nil {

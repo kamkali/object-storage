@@ -16,13 +16,36 @@ type NodeManager struct {
 	mock.Mock
 }
 
-// SelectNode provides a mock function with given fields: ctx, objectID
-func (_m *NodeManager) SelectNode(ctx context.Context, objectID uuid.UUID) (domain.StorageNode, error) {
-	ret := _m.Called(ctx, objectID)
+// DiscoverNodes provides a mock function with given fields: ctx
+func (_m *NodeManager) DiscoverNodes(ctx context.Context) ([]domain.StorageNode, error) {
+	ret := _m.Called(ctx)
+
+	var r0 []domain.StorageNode
+	if rf, ok := ret.Get(0).(func(context.Context) []domain.StorageNode); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.StorageNode)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetNode provides a mock function with given fields: ctx, key
+func (_m *NodeManager) GetNode(ctx context.Context, key uuid.UUID) (domain.StorageNode, error) {
+	ret := _m.Called(ctx, key)
 
 	var r0 domain.StorageNode
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) domain.StorageNode); ok {
-		r0 = rf(ctx, objectID)
+		r0 = rf(ctx, key)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(domain.StorageNode)
@@ -31,12 +54,40 @@ func (_m *NodeManager) SelectNode(ctx context.Context, objectID uuid.UUID) (doma
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
-		r1 = rf(ctx, objectID)
+		r1 = rf(ctx, key)
 	} else {
 		r1 = ret.Error(1)
 	}
 
 	return r0, r1
+}
+
+// ReBalance provides a mock function with given fields: ctx, nodes
+func (_m *NodeManager) ReBalance(ctx context.Context, nodes []domain.StorageNode) error {
+	ret := _m.Called(ctx, nodes)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, []domain.StorageNode) error); ok {
+		r0 = rf(ctx, nodes)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// RefreshNodes provides a mock function with given fields: ctx
+func (_m *NodeManager) RefreshNodes(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 type mockConstructorTestingTNewNodeManager interface {

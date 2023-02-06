@@ -1,8 +1,8 @@
 build-container:
 	docker build -t object-storage:latest .
 
-run-container:
-	docker run -it --name object-storage object-storage:latest
+compose:
+	docker compose up --build
 
 tools:
 	cat tools.go | grep _ | grep \".*\" -o | xargs -tI % go install %
@@ -24,4 +24,4 @@ fmt-imports:
 
 format: fmt-code fmt-imports
 
-.PHONY: build-container run-container tools generate lint format
+.PHONY: build-container compose tools generate lint format
