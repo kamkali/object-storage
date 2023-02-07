@@ -16,20 +16,6 @@ type StorageNode struct {
 	mock.Mock
 }
 
-// Addr provides a mock function with given fields: ctx
-func (_m *StorageNode) Addr(ctx context.Context) string {
-	ret := _m.Called(ctx)
-
-	var r0 string
-	if rf, ok := ret.Get(0).(func(context.Context) string); ok {
-		r0 = rf(ctx)
-	} else {
-		r0 = ret.Get(0).(string)
-	}
-
-	return r0
-}
-
 // GetObject provides a mock function with given fields: ctx, id
 func (_m *StorageNode) GetObject(ctx context.Context, id uuid.UUID) (*domain.Object, error) {
 	ret := _m.Called(ctx, id)

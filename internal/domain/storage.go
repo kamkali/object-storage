@@ -28,7 +28,6 @@ type NodeManager interface {
 
 type StorageNode interface {
 	ID() uuid.UUID
-	Addr(ctx context.Context) string
 	IsAlive(ctx context.Context) bool
 	PutObject(ctx context.Context, o *Object) error
 	GetObject(ctx context.Context, id uuid.UUID) (*Object, error)

@@ -1,6 +1,7 @@
 package consistent_hash
 
 import (
+	"fmt"
 	"hash/crc32"
 	"sort"
 	"sync"
@@ -26,6 +27,10 @@ func NewRingLoadBalancer() *RingLoadBalancer {
 func (r *RingLoadBalancer) GetNode(ctx context.Context, key uuid.UUID) (domain.StorageNode, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
+	if len(r.nodes) == 0 {
+		return nil, fmt.Errorf("no nodes in the ring")
+	}
 
 	i := sort.Search(r.nodes.Len(), func(i int) bool {
 		return r.nodes[i].HashID >= crc32.ChecksumIEEE([]byte(key.String()))
