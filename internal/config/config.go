@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	Server struct {
-		Host    string        `envconfig:"SERVER_HOST" default:"localhost"`
+		Host    string        `envconfig:"SERVER_HOST" default:"0.0.0.0"`
 		Port    string        `envconfig:"PORT" default:"3000"`
 		Timeout time.Duration `envconfig:"SERVER_TIMEOUT" default:"15s"`
 	}
