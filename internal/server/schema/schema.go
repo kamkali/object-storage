@@ -4,7 +4,7 @@ const (
 	ErrInternal   = "Internal server error"
 	ErrNotFound   = "Not found"
 	ErrBadRequest = "Bad request"
-	ErrInvalidID  = "Invalid id - must be up to 32 alphanum"
+	ErrInvalidID  = "ID must be alphanum up to 32 characters"
 	ErrTimedOut   = "Timed out"
 )
 

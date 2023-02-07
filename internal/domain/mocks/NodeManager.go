@@ -60,8 +60,8 @@ func (_m *NodeManager) GetNode(ctx context.Context, key string) (domain.StorageN
 	return r0, r1
 }
 
-// ReBalance provides a mock function with given fields: ctx, nodes
-func (_m *NodeManager) ReBalance(ctx context.Context, nodes []domain.StorageNode) error {
+// Rebalance provides a mock function with given fields: ctx, nodes
+func (_m *NodeManager) Rebalance(ctx context.Context, nodes []domain.StorageNode) error {
 	ret := _m.Called(ctx, nodes)
 
 	var r0 error

@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/kamkalis/object-storage/internal/domain"
 	"github.com/kamkalis/object-storage/internal/domain/mocks"
@@ -35,7 +34,7 @@ func TestPutObjectHandler(t *testing.T) {
 		{
 			name: "happy path",
 			args: args{
-				id:   uuid.NewString(),
+				id:   "SomeID123",
 				body: strings.NewReader("object body"),
 			},
 			prepFunc: func(s *mocks.StorageService, a args) {
@@ -64,7 +63,7 @@ func TestPutObjectHandler(t *testing.T) {
 		{
 			name: "no body",
 			args: args{
-				id:   uuid.NewString(),
+				id:   "SomeID123",
 				body: nil,
 			},
 			wantCode: http.StatusBadRequest,
@@ -72,7 +71,7 @@ func TestPutObjectHandler(t *testing.T) {
 		{
 			name: "service error",
 			args: args{
-				id:   uuid.NewString(),
+				id:   "SomeID123",
 				body: strings.NewReader("object body"),
 			},
 			prepFunc: func(s *mocks.StorageService, a args) {
@@ -128,7 +127,7 @@ func TestGetObjectHandler(t *testing.T) {
 		{
 			name: "happy path",
 			args: args{
-				id: uuid.NewString(),
+				id: "SomeID123",
 			},
 			prepFunc: func(s *mocks.StorageService, a args) {
 				s.On("GetObject", mock.Anything, a.id).
@@ -160,7 +159,7 @@ func TestGetObjectHandler(t *testing.T) {
 		{
 			name: "not found",
 			args: args{
-				id: uuid.NewString(),
+				id: "SomeID123",
 			},
 			prepFunc: func(s *mocks.StorageService, a args) {
 				s.On("GetObject", mock.Anything, mock.Anything).
@@ -174,7 +173,7 @@ func TestGetObjectHandler(t *testing.T) {
 		{
 			name: "service error",
 			args: args{
-				id: uuid.NewString(),
+				id: "SomeID123",
 			},
 			prepFunc: func(s *mocks.StorageService, a args) {
 				s.On("GetObject", mock.Anything, mock.Anything).

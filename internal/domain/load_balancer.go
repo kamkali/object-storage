@@ -6,7 +6,7 @@ import (
 
 type LoadBalancer interface {
 	GetNode(ctx context.Context, key string) (StorageNode, error)
-	ReBalance(ctx context.Context, nodes []StorageNode) error
+	Rebalance(ctx context.Context, nodes []StorageNode) error
 }
 
 //go:generate mockery --name=LoadBalancer

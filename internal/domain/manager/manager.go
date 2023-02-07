@@ -22,7 +22,7 @@ func (s *StorageManager) RefreshNodes(ctx context.Context) error {
 		return fmt.Errorf("discover nodes: %w", err)
 	}
 
-	if err := s.ReBalance(ctx, nodes); err != nil {
+	if err := s.Rebalance(ctx, nodes); err != nil {
 		return fmt.Errorf("rebalance nodes: %w", err)
 	}
 
