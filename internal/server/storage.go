@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -40,8 +41,12 @@ func (s *Server) putObjectHandler() http.HandlerFunc {
 			s.writeErrResponse(w, http.StatusInternalServerError, schema.ErrInternal)
 			return
 		}
-
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
+		if err := json.NewEncoder(w).Encode(schema.PutObjectResponse{ID: objectID.String()}); err != nil {
+			log.Println(fmt.Errorf("cannot write object response: %w", err))
+			return
+		}
 	}
 }
 
@@ -66,6 +71,7 @@ func (s *Server) getObjectHandler() http.HandlerFunc {
 			return
 		}
 
+		w.Header().Set("Content-Type", object.ContentType)
 		w.WriteHeader(http.StatusOK)
 		if _, err := io.Copy(w, object.Content); err != nil {
 			log.Println(fmt.Errorf("cannot write object response: %w", err))
