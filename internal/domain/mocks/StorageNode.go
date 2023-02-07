@@ -40,16 +40,14 @@ func (_m *StorageNode) GetObject(ctx context.Context, id uuid.UUID) (*domain.Obj
 }
 
 // ID provides a mock function with given fields:
-func (_m *StorageNode) ID() uuid.UUID {
+func (_m *StorageNode) ID() string {
 	ret := _m.Called()
 
-	var r0 uuid.UUID
-	if rf, ok := ret.Get(0).(func() uuid.UUID); ok {
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
 		r0 = rf()
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(uuid.UUID)
-		}
+		r0 = ret.Get(0).(string)
 	}
 
 	return r0

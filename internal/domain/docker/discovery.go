@@ -21,9 +21,10 @@ type NodeDiscoverer struct {
 }
 
 const (
-	ImageMinio           = "minio/minio"
-	EnvKeyMinioAccessKey = "MINIO_ACCESS_KEY="
-	EnvKeyMinioSecretKey = "MINIO_SECRET_KEY="
+	ImageMinio = "minio/minio"
+
+	EnvKeyMinioAccessKey = "MINIO_ACCESS_KEY"
+	EnvKeyMinioSecretKey = "MINIO_SECRET_KEY"
 )
 
 func NewNodeDiscoverer(nodeID, nodePort, networkID string) (*NodeDiscoverer, error) {
@@ -69,40 +70,38 @@ func (n *NodeDiscoverer) toDomainNode(ctx context.Context, c types.Container) (d
 	}
 }
 
-func (n *NodeDiscoverer) mapToMinioNode(ctx context.Context, c types.Container) (domain.StorageNode, error) {
-	container, err := n.c.ContainerInspect(ctx, c.ID)
+func (n *NodeDiscoverer) mapToMinioNode(ctx context.Context, container types.Container) (domain.StorageNode, error) {
+	c, err := n.c.ContainerInspect(ctx, container.ID)
 	if err != nil {
 		return nil, fmt.Errorf("inspect container id=%s: %w", c.ID, err)
 	}
 
-	var (
-		accessKey string
-		secretKey string
-	)
-	for _, env := range container.Config.Env {
-		if strings.Contains(env, EnvKeyMinioAccessKey) {
-			split := strings.Split(env, "=")
-			if len(split) < 1 {
-				return nil, fmt.Errorf("no value for access key")
-			}
-			accessKey = split[1]
-		}
-		if strings.Contains(env, EnvKeyMinioSecretKey) {
-			split := strings.Split(env, "=")
-			if len(split) < 1 {
-				return nil, fmt.Errorf("no value for access key")
-			}
-			secretKey = split[1]
-		}
+	accessKey, ok := getEnvValueByKey(c, EnvKeyMinioAccessKey)
+	if !ok {
+		return nil, fmt.Errorf("get minio access key failed")
+	}
+	secretKey, ok := getEnvValueByKey(c, EnvKeyMinioSecretKey)
+	if !ok {
+		return nil, fmt.Errorf("get minio secret key failed")
 	}
 
 	network, ok := c.NetworkSettings.Networks[n.networkIdentifier]
 	if !ok {
 		return nil, fmt.Errorf("cannot retrieve network=%s settings", n.networkIdentifier)
 	}
-	node, err := minio.NewNode(net.JoinHostPort(network.IPAddress, n.nodePort), accessKey, secretKey)
+	node, err := minio.NewNode(c.ID, net.JoinHostPort(network.IPAddress, n.nodePort), accessKey, secretKey)
 	if err != nil {
 		return nil, fmt.Errorf("new minio node: %w", err)
 	}
 	return node, nil
+}
+
+func getEnvValueByKey(container types.ContainerJSON, key string) (string, bool) {
+	for _, env := range container.Config.Env {
+		if strings.Contains(env, key+"=") {
+			split := strings.Split(env, "=")
+			return split[1], true
+		}
+	}
+	return "", false
 }

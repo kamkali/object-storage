@@ -2,6 +2,7 @@ package minio
 
 import (
 	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/kamkalis/object-storage/internal/domain"
 	"github.com/minio/minio-go/v7"
@@ -14,11 +15,11 @@ const (
 )
 
 type Node struct {
-	id uuid.UUID
+	id string
 	c  *minio.Client
 }
 
-func NewNode(endpoint string, accessKeyID string, secretAccessKey string) (*Node, error) {
+func NewNode(id string, endpoint string, accessKeyID string, secretAccessKey string) (*Node, error) {
 	minioClient, err := minio.New(endpoint, &minio.Options{
 		Creds: credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 	})
@@ -27,7 +28,7 @@ func NewNode(endpoint string, accessKeyID string, secretAccessKey string) (*Node
 	}
 
 	n := &Node{
-		id: uuid.New(),
+		id: id,
 		c:  minioClient,
 	}
 
@@ -67,18 +68,15 @@ func (n *Node) GetObject(ctx context.Context, id uuid.UUID) (*domain.Object, err
 		return nil, fmt.Errorf("get stats from minio object=%s: %w", id.String(), err)
 	}
 	return &domain.Object{
-		ID:      id,
-		Content: object,
-		Size:    s.Size,
+		ID:          id,
+		Content:     object,
+		ContentType: s.ContentType,
+		Size:        s.Size,
 	}, nil
 }
 
-func (n *Node) ID() uuid.UUID {
+func (n *Node) ID() string {
 	return n.id
-}
-
-func (n *Node) Addr(ctx context.Context) string {
-	return n.c.EndpointURL().String()
 }
 
 func (n *Node) IsAlive(ctx context.Context) bool {
