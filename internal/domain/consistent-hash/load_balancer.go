@@ -6,7 +6,6 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/google/uuid"
 	"github.com/kamkalis/object-storage/internal/domain"
 	"golang.org/x/net/context"
 )
@@ -24,7 +23,7 @@ func NewRingLoadBalancer() *RingLoadBalancer {
 	}
 }
 
-func (r *RingLoadBalancer) GetNode(ctx context.Context, key uuid.UUID) (domain.StorageNode, error) {
+func (r *RingLoadBalancer) GetNode(ctx context.Context, key string) (domain.StorageNode, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -33,7 +32,7 @@ func (r *RingLoadBalancer) GetNode(ctx context.Context, key uuid.UUID) (domain.S
 	}
 
 	i := sort.Search(r.nodes.Len(), func(i int) bool {
-		return r.nodes[i].HashID >= crc32.ChecksumIEEE([]byte(key.String()))
+		return r.nodes[i].HashID >= crc32.ChecksumIEEE([]byte(key))
 	})
 	if i >= r.nodes.Len() {
 		i = 0

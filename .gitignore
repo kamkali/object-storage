@@ -16,3 +16,8 @@
 
 # IDE
 .idea
+
+
+# Debug
+Dockerfile.debug
+docker-compose-debug.yml

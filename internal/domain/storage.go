@@ -4,12 +4,12 @@ import (
 	"errors"
 	"io"
 
-	"github.com/google/uuid"
 	"golang.org/x/net/context"
 )
 
 var (
 	ErrObjNotFound = errors.New("object not found")
+	ErrInvalidID   = errors.New("invalid ID")
 )
 
 type NodeDiscoverer interface {
@@ -30,13 +30,13 @@ type StorageNode interface {
 	ID() string
 	IsAlive(ctx context.Context) bool
 	PutObject(ctx context.Context, o *Object) error
-	GetObject(ctx context.Context, id uuid.UUID) (*Object, error)
+	GetObject(ctx context.Context, key string) (*Object, error)
 }
 
 //go:generate mockery --name=StorageNode
 
 type Object struct {
-	ID          uuid.UUID
+	ID          string
 	Content     io.Reader
 	ContentType string
 	Size        int64
@@ -44,7 +44,7 @@ type Object struct {
 
 type StorageService interface {
 	PutObject(ctx context.Context, o *Object) error
-	GetObject(ctx context.Context, id uuid.UUID) (*Object, error)
+	GetObject(ctx context.Context, key string) (*Object, error)
 }
 
 //go:generate mockery --name=StorageService

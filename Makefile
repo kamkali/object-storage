@@ -1,6 +1,9 @@
 build-container:
 	docker build -t object-storage:latest .
 
+compose-debug:
+	docker compose -f docker-compose-debug.yml up --build
+
 compose:
 	docker compose up --build
 

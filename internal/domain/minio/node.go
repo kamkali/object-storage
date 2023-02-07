@@ -3,7 +3,6 @@ package minio
 import (
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/kamkalis/object-storage/internal/domain"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -50,17 +49,17 @@ func (n *Node) createBucket(ctx context.Context) error {
 }
 
 func (n *Node) PutObject(ctx context.Context, o *domain.Object) error {
-	_, err := n.c.PutObject(ctx, bucketName, o.ID.String(), o.Content, o.Size, minio.PutObjectOptions{ContentType: o.ContentType})
+	_, err := n.c.PutObject(ctx, bucketName, o.ID, o.Content, o.Size, minio.PutObjectOptions{ContentType: o.ContentType})
 	if err != nil {
-		return fmt.Errorf("put object=%s to minio: %w", o.ID.String(), err)
+		return fmt.Errorf("put object=%s to minio: %w", o.ID, err)
 	}
 	return nil
 }
 
-func (n *Node) GetObject(ctx context.Context, id uuid.UUID) (*domain.Object, error) {
-	object, err := n.c.GetObject(ctx, bucketName, id.String(), minio.GetObjectOptions{})
+func (n *Node) GetObject(ctx context.Context, id string) (*domain.Object, error) {
+	object, err := n.c.GetObject(ctx, bucketName, id, minio.GetObjectOptions{})
 	if err != nil {
-		return nil, fmt.Errorf("get object=%s from minio: %w", id.String(), err)
+		return nil, fmt.Errorf("get object=%s from minio: %w", id, err)
 	}
 
 	s, err := object.Stat()
@@ -69,7 +68,7 @@ func (n *Node) GetObject(ctx context.Context, id uuid.UUID) (*domain.Object, err
 		if e.Code == "NoSuchKey" {
 			return nil, domain.ErrObjNotFound
 		}
-		return nil, fmt.Errorf("get stats from minio object=%s: %w", id.String(), err)
+		return nil, fmt.Errorf("get stats from minio object=%s: %w", id, err)
 	}
 	return &domain.Object{
 		ID:          id,

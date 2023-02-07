@@ -3,7 +3,6 @@ package consistent_hash
 import (
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/kamkalis/object-storage/internal/domain"
 	"github.com/kamkalis/object-storage/internal/domain/mocks"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +21,7 @@ func TestGetNode(t *testing.T) {
 	tests := []struct {
 		name     string
 		nodes    []domain.StorageNode
-		key      uuid.UUID
+		key      string
 		prepFunc func()
 		expected domain.StorageNode
 		wantErr  bool
@@ -33,7 +32,7 @@ func TestGetNode(t *testing.T) {
 			prepFunc: func() {
 				n1.On("ID").Return("node-1")
 			},
-			key:      uuid.MustParse("00000000-0000-0000-0000-000000000002"),
+			key:      "key-1",
 			expected: n1,
 		},
 		{
@@ -44,13 +43,13 @@ func TestGetNode(t *testing.T) {
 				n2.On("ID").Return("node-4")
 				n3.On("ID").Return("node-5")
 			},
-			key:      uuid.MustParse("00000000-0000-0000-0000-000000000006"),
+			key:      "key-5",
 			expected: n1,
 		},
 		{
 			name:    "Empty ring",
 			nodes:   []domain.StorageNode{},
-			key:     uuid.New(),
+			key:     "key-x",
 			wantErr: true,
 		},
 	}

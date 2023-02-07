@@ -40,7 +40,7 @@ func TestPutObjectHandler(t *testing.T) {
 			},
 			prepFunc: func(s *mocks.StorageService, a args) {
 				s.On("PutObject", mock.Anything, &domain.Object{
-					ID:      uuid.MustParse(a.id),
+					ID:      a.id,
 					Content: bytes.NewBuffer([]byte("object body")),
 					Size:    11,
 				}).Return(nil)
@@ -53,7 +53,11 @@ func TestPutObjectHandler(t *testing.T) {
 		{
 			name: "invalid object id",
 			args: args{
-				id: "weird_id",
+				id:   "",
+				body: strings.NewReader("object body"),
+			},
+			prepFunc: func(s *mocks.StorageService, a args) {
+				s.On("PutObject", mock.Anything, mock.Anything).Return(domain.ErrInvalidID)
 			},
 			wantCode: http.StatusBadRequest,
 		},
@@ -127,9 +131,9 @@ func TestGetObjectHandler(t *testing.T) {
 				id: uuid.NewString(),
 			},
 			prepFunc: func(s *mocks.StorageService, a args) {
-				s.On("GetObject", mock.Anything, uuid.MustParse(a.id)).
+				s.On("GetObject", mock.Anything, a.id).
 					Return(&domain.Object{
-						ID:      uuid.MustParse(a.id),
+						ID:      a.id,
 						Content: bytes.NewBuffer([]byte("object body")),
 						Size:    11,
 					}, nil)
@@ -142,10 +146,14 @@ func TestGetObjectHandler(t *testing.T) {
 		{
 			name: "invalid object id",
 			args: args{
-				id: "weird_id",
+				id: "!!!",
+			},
+			prepFunc: func(s *mocks.StorageService, a args) {
+				s.On("GetObject", mock.Anything, mock.Anything).
+					Return(nil, domain.ErrInvalidID)
 			},
 			want: resp{
-				body: mustMarshal(t, schema.ServerError{Error: schema.ErrBadRequest}),
+				body: mustMarshal(t, schema.ServerError{Error: schema.ErrInvalidID}),
 				code: http.StatusBadRequest,
 			},
 		},

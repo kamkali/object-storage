@@ -2,11 +2,13 @@ package service
 
 import (
 	"fmt"
+	"regexp"
 
-	"github.com/google/uuid"
 	"github.com/kamkalis/object-storage/internal/domain"
 	"golang.org/x/net/context"
 )
+
+var idRe = regexp.MustCompile(`^[a-zA-Z0-9]{1,32}$`)
 
 type StorageService struct {
 	manager domain.NodeManager
@@ -19,6 +21,10 @@ func NewStorage(manager domain.NodeManager) *StorageService {
 }
 
 func (s StorageService) PutObject(ctx context.Context, o *domain.Object) error {
+	if !idRe.Match([]byte(o.ID)) {
+		return domain.ErrInvalidID
+	}
+
 	node, err := s.manager.GetNode(ctx, o.ID)
 	if err != nil {
 		return fmt.Errorf("select node: %w", err)
@@ -31,8 +37,12 @@ func (s StorageService) PutObject(ctx context.Context, o *domain.Object) error {
 	return node.PutObject(ctx, o)
 }
 
-func (s StorageService) GetObject(ctx context.Context, id uuid.UUID) (*domain.Object, error) {
-	node, err := s.manager.GetNode(ctx, id)
+func (s StorageService) GetObject(ctx context.Context, key string) (*domain.Object, error) {
+	if !idRe.Match([]byte(key)) {
+		return nil, domain.ErrInvalidID
+	}
+
+	node, err := s.manager.GetNode(ctx, key)
 	if err != nil {
 		return nil, fmt.Errorf("select node: %w", err)
 	}
@@ -41,5 +51,5 @@ func (s StorageService) GetObject(ctx context.Context, id uuid.UUID) (*domain.Ob
 		return nil, fmt.Errorf("node %s offline", node.ID())
 	}
 
-	return node.GetObject(ctx, id)
+	return node.GetObject(ctx, key)
 }
