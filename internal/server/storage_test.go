@@ -29,6 +29,7 @@ func TestPutObjectHandler(t *testing.T) {
 		name     string
 		args     args
 		prepFunc func(s *mocks.StorageService, a args)
+		expected func(a args) schema.PutObjectResponse
 		wantCode int
 	}{
 		{
@@ -43,6 +44,9 @@ func TestPutObjectHandler(t *testing.T) {
 					Content: bytes.NewBuffer([]byte("object body")),
 					Size:    11,
 				}).Return(nil)
+			},
+			expected: func(a args) schema.PutObjectResponse {
+				return schema.PutObjectResponse{ID: a.id}
 			},
 			wantCode: http.StatusCreated,
 		},
@@ -92,6 +96,13 @@ func TestPutObjectHandler(t *testing.T) {
 			res := httptest.NewRecorder()
 			s.putObjectHandler().ServeHTTP(res, req)
 			assert.Equal(t, tt.wantCode, res.Code)
+			var wantResp schema.PutObjectResponse
+			err := json.NewDecoder(res.Body).Decode(&wantResp)
+			require.NoError(t, err)
+			if tt.expected != nil {
+				assert.Equal(t, tt.expected(tt.args), wantResp)
+			}
+
 		})
 	}
 }

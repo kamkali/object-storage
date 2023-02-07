@@ -10,3 +10,7 @@ const (
 type ServerError struct {
 	Error string `json:"error"`
 }
+
+type PutObjectResponse struct {
+	ID string
+}
