@@ -41,12 +41,12 @@ func TestStorageService_PutObject(t *testing.T) {
 			},
 			prepFunc: func(d *mockDeps, a args) {
 				d.manager.
-					On("SelectNode", a.ctx, a.o.ID).
+					On("GetNode", a.ctx, a.o.ID).
 					Return(d.node, nil)
 
 				d.node.
-					On("PutObject", a.ctx, a.o).
-					Return(nil)
+					On("IsAlive", a.ctx).Return(true).
+					On("PutObject", a.ctx, a.o).Return(nil)
 			},
 			wantErr: false,
 		},
@@ -61,8 +61,26 @@ func TestStorageService_PutObject(t *testing.T) {
 			},
 			prepFunc: func(d *mockDeps, a args) {
 				d.manager.
-					On("SelectNode", a.ctx, a.o.ID).
+					On("GetNode", a.ctx, a.o.ID).
 					Return(nil, errors.New("err"))
+			},
+			wantErr: true,
+		},
+		{
+			name: "node offline",
+			args: args{
+				ctx: ctx,
+				o: &domain.Object{
+					ID:      uuid.New(),
+					Content: bytes.NewReader([]byte("content")),
+				},
+			},
+			prepFunc: func(d *mockDeps, a args) {
+				d.manager.
+					On("GetNode", a.ctx, a.o.ID).Return(d.node, nil)
+				d.node.
+					On("ID").Return(uuid.New()).
+					On("IsAlive", a.ctx).Return(false)
 			},
 			wantErr: true,
 		},
@@ -77,12 +95,12 @@ func TestStorageService_PutObject(t *testing.T) {
 			},
 			prepFunc: func(d *mockDeps, a args) {
 				d.manager.
-					On("SelectNode", a.ctx, a.o.ID).
+					On("GetNode", a.ctx, a.o.ID).
 					Return(d.node, nil)
 
 				d.node.
-					On("PutObject", a.ctx, a.o).
-					Return(errors.New("err"))
+					On("IsAlive", a.ctx).Return(true).
+					On("PutObject", a.ctx, a.o).Return(errors.New("err"))
 			},
 			wantErr: true,
 		},
@@ -135,12 +153,12 @@ func TestStorageService_GetObject(t *testing.T) {
 			},
 			prepFunc: func(d *mockDeps, a args) {
 				d.manager.
-					On("SelectNode", a.ctx, a.id).
+					On("GetNode", a.ctx, a.id).
 					Return(d.node, nil)
 
 				d.node.
-					On("GetObject", a.ctx, a.id).
-					Return(expected, nil)
+					On("IsAlive", a.ctx).Return(true).
+					On("GetObject", a.ctx, a.id).Return(expected, nil)
 			},
 			expected: expected,
 			wantErr:  false,
@@ -153,8 +171,23 @@ func TestStorageService_GetObject(t *testing.T) {
 			},
 			prepFunc: func(d *mockDeps, a args) {
 				d.manager.
-					On("SelectNode", a.ctx, a.id).
+					On("GetNode", a.ctx, a.id).
 					Return(nil, errors.New("err"))
+			},
+			wantErr: true,
+		},
+		{
+			name: "node offline",
+			args: args{
+				ctx: ctx,
+				id:  uuid.New(),
+			},
+			prepFunc: func(d *mockDeps, a args) {
+				d.manager.
+					On("GetNode", a.ctx, a.id).Return(d.node, nil)
+				d.node.
+					On("ID").Return(uuid.New()).
+					On("IsAlive", a.ctx).Return(false)
 			},
 			wantErr: true,
 		},
@@ -166,12 +199,12 @@ func TestStorageService_GetObject(t *testing.T) {
 			},
 			prepFunc: func(d *mockDeps, a args) {
 				d.manager.
-					On("SelectNode", a.ctx, a.id).
+					On("GetNode", a.ctx, a.id).
 					Return(d.node, nil)
 
 				d.node.
-					On("GetObject", a.ctx, a.id).
-					Return(nil, errors.New("err"))
+					On("IsAlive", a.ctx).Return(true).
+					On("GetObject", a.ctx, a.id).Return(nil, errors.New("err"))
 			},
 			wantErr: true,
 		},
