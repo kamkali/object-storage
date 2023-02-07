@@ -22,7 +22,7 @@ func TestStorageManager_RefreshNodes(t *testing.T) {
 	}
 	t.Run("happy path", func(t *testing.T) {
 		dv.On("DiscoverNodes", ctx).Return(nodes, nil).Once()
-		lb.On("ReBalance", ctx, nodes).Return(nil).Once()
+		lb.On("Rebalance", ctx, nodes).Return(nil).Once()
 		err := s.RefreshNodes(ctx)
 		assert.NoError(t, err)
 	})
@@ -35,7 +35,7 @@ func TestStorageManager_RefreshNodes(t *testing.T) {
 	t.Run("load balancer err wrapped", func(t *testing.T) {
 		mockErr := errors.New("mockerr")
 		dv.On("DiscoverNodes", ctx).Return(nodes, nil).Once()
-		lb.On("ReBalance", ctx, nodes).Return(mockErr).Once()
+		lb.On("Rebalance", ctx, nodes).Return(mockErr).Once()
 
 		err := s.RefreshNodes(ctx)
 		assert.ErrorIs(t, err, mockErr)

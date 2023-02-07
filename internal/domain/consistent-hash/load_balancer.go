@@ -40,7 +40,7 @@ func (r *RingLoadBalancer) GetNode(ctx context.Context, key string) (domain.Stor
 	return r.nodes[i], nil
 }
 
-func (r *RingLoadBalancer) ReBalance(ctx context.Context, nodes []domain.StorageNode) error {
+func (r *RingLoadBalancer) Rebalance(ctx context.Context, nodes []domain.StorageNode) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

@@ -61,7 +61,7 @@ func TestGetNode(t *testing.T) {
 			}
 
 			lb := NewRingLoadBalancer()
-			err := lb.ReBalance(ctx, tt.nodes)
+			err := lb.Rebalance(ctx, tt.nodes)
 			require.NoError(t, err)
 
 			node, err := lb.GetNode(ctx, tt.key)
