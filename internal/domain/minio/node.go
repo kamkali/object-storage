@@ -65,6 +65,10 @@ func (n *Node) GetObject(ctx context.Context, id uuid.UUID) (*domain.Object, err
 
 	s, err := object.Stat()
 	if err != nil {
+		e := minio.ToErrorResponse(err)
+		if e.Code == "NoSuchKey" {
+			return nil, domain.ErrObjNotFound
+		}
 		return nil, fmt.Errorf("get stats from minio object=%s: %w", id.String(), err)
 	}
 	return &domain.Object{
