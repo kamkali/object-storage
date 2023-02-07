@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/kamkalis/object-storage/internal/domain"
 	"github.com/kamkalis/object-storage/internal/domain/mocks"
 	"github.com/stretchr/testify/assert"
@@ -35,7 +34,7 @@ func TestStorageService_PutObject(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				o: &domain.Object{
-					ID:      uuid.New(),
+					ID:      "SomeId123",
 					Content: bytes.NewReader([]byte("content")),
 				},
 			},
@@ -55,7 +54,7 @@ func TestStorageService_PutObject(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				o: &domain.Object{
-					ID:      uuid.New(),
+					ID:      "SomeId123",
 					Content: bytes.NewReader([]byte("content")),
 				},
 			},
@@ -67,11 +66,22 @@ func TestStorageService_PutObject(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "ID not alphanum",
+			args: args{
+				ctx: ctx,
+				o: &domain.Object{
+					ID:      "WhatNot!!!--",
+					Content: bytes.NewReader([]byte("content")),
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "node offline",
 			args: args{
 				ctx: ctx,
 				o: &domain.Object{
-					ID:      uuid.New(),
+					ID:      "SomeId123",
 					Content: bytes.NewReader([]byte("content")),
 				},
 			},
@@ -89,7 +99,7 @@ func TestStorageService_PutObject(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				o: &domain.Object{
-					ID:      uuid.New(),
+					ID:      "SomeId123",
 					Content: bytes.NewReader([]byte("content")),
 				},
 			},
@@ -127,7 +137,7 @@ func TestStorageService_PutObject(t *testing.T) {
 func TestStorageService_GetObject(t *testing.T) {
 	ctx := context.Background()
 	expected := &domain.Object{
-		ID:      uuid.New(),
+		ID:      "SomeId123",
 		Content: bytes.NewReader([]byte("content")),
 	}
 	type mockDeps struct {
@@ -136,7 +146,7 @@ func TestStorageService_GetObject(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		id  uuid.UUID
+		id  string
 	}
 	testCases := []struct {
 		name     string
@@ -149,7 +159,7 @@ func TestStorageService_GetObject(t *testing.T) {
 			name: "gets object successfully",
 			args: args{
 				ctx: ctx,
-				id:  uuid.New(),
+				id:  "SomeId123",
 			},
 			prepFunc: func(d *mockDeps, a args) {
 				d.manager.
@@ -167,7 +177,7 @@ func TestStorageService_GetObject(t *testing.T) {
 			name: "cannot select node",
 			args: args{
 				ctx: ctx,
-				id:  uuid.New(),
+				id:  "SomeId123",
 			},
 			prepFunc: func(d *mockDeps, a args) {
 				d.manager.
@@ -177,10 +187,18 @@ func TestStorageService_GetObject(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "ID empty",
+			args: args{
+				ctx: ctx,
+				id:  "WhatNot!!!--",
+			},
+			wantErr: true,
+		},
+		{
 			name: "node offline",
 			args: args{
 				ctx: ctx,
-				id:  uuid.New(),
+				id:  "SomeId123",
 			},
 			prepFunc: func(d *mockDeps, a args) {
 				d.manager.
@@ -195,7 +213,7 @@ func TestStorageService_GetObject(t *testing.T) {
 			name: "cannot put to selected node",
 			args: args{
 				ctx: ctx,
-				id:  uuid.New(),
+				id:  "SomeId123",
 			},
 			prepFunc: func(d *mockDeps, a args) {
 				d.manager.

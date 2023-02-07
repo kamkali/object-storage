@@ -2,12 +2,10 @@ package domain
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 type LoadBalancer interface {
-	GetNode(ctx context.Context, key uuid.UUID) (StorageNode, error)
+	GetNode(ctx context.Context, key string) (StorageNode, error)
 	ReBalance(ctx context.Context, nodes []StorageNode) error
 }
 
