@@ -2,11 +2,12 @@ package manager
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/kamkalis/object-storage/internal/domain"
 	"github.com/kamkalis/object-storage/internal/domain/mocks"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
-	"testing"
 )
 
 func TestStorageManager_RefreshNodes(t *testing.T) {

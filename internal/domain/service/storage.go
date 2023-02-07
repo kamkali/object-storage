@@ -25,7 +25,7 @@ func (s StorageService) PutObject(ctx context.Context, o *domain.Object) error {
 	}
 
 	if !node.IsAlive(ctx) {
-		return fmt.Errorf("node %s offline", node.ID().String())
+		return fmt.Errorf("node %s offline", node.ID())
 	}
 
 	return node.PutObject(ctx, o)
@@ -38,7 +38,7 @@ func (s StorageService) GetObject(ctx context.Context, id uuid.UUID) (*domain.Ob
 	}
 
 	if !node.IsAlive(ctx) {
-		return nil, fmt.Errorf("node %s offline", node.ID().String())
+		return nil, fmt.Errorf("node %s offline", node.ID())
 	}
 
 	return node.GetObject(ctx, id)

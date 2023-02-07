@@ -79,7 +79,7 @@ func TestStorageService_PutObject(t *testing.T) {
 				d.manager.
 					On("GetNode", a.ctx, a.o.ID).Return(d.node, nil)
 				d.node.
-					On("ID").Return(uuid.New()).
+					On("ID").Return("node-1").
 					On("IsAlive", a.ctx).Return(false)
 			},
 			wantErr: true,
@@ -186,7 +186,7 @@ func TestStorageService_GetObject(t *testing.T) {
 				d.manager.
 					On("GetNode", a.ctx, a.id).Return(d.node, nil)
 				d.node.
-					On("ID").Return(uuid.New()).
+					On("ID").Return("node-1").
 					On("IsAlive", a.ctx).Return(false)
 			},
 			wantErr: true,

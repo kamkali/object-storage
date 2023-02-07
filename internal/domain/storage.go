@@ -27,7 +27,7 @@ type NodeManager interface {
 //go:generate mockery --name=NodeManager
 
 type StorageNode interface {
-	ID() uuid.UUID
+	ID() string
 	IsAlive(ctx context.Context) bool
 	PutObject(ctx context.Context, o *Object) error
 	GetObject(ctx context.Context, id uuid.UUID) (*Object, error)

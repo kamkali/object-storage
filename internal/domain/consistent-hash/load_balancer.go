@@ -49,7 +49,7 @@ func (r *RingLoadBalancer) ReBalance(ctx context.Context, nodes []domain.Storage
 	for _, server := range nodes {
 		r.nodes = append(r.nodes, &RingNode{
 			StorageNode: server,
-			HashID:      crc32.ChecksumIEEE([]byte(server.ID().String())),
+			HashID:      crc32.ChecksumIEEE([]byte(server.ID())),
 		})
 	}
 	sort.Sort(r.nodes)

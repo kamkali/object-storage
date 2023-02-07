@@ -31,7 +31,7 @@ func TestGetNode(t *testing.T) {
 			name:  "Single node in the ring",
 			nodes: []domain.StorageNode{n1},
 			prepFunc: func() {
-				n1.On("ID").Return(uuid.MustParse("00000000-0000-0000-0000-000000000001"))
+				n1.On("ID").Return("node-1")
 			},
 			key:      uuid.MustParse("00000000-0000-0000-0000-000000000002"),
 			expected: n1,
@@ -40,12 +40,12 @@ func TestGetNode(t *testing.T) {
 			name:  "Multiple nodes in the ring",
 			nodes: []domain.StorageNode{n1, n2, n3},
 			prepFunc: func() {
-				n1.On("ID").Return(uuid.MustParse("00000000-0000-0000-0000-000000000003"))
-				n2.On("ID").Return(uuid.MustParse("00000000-0000-0000-0000-000000000004"))
-				n3.On("ID").Return(uuid.MustParse("00000000-0000-0000-0000-000000000005"))
+				n1.On("ID").Return("node-3")
+				n2.On("ID").Return("node-4")
+				n3.On("ID").Return("node-5")
 			},
 			key:      uuid.MustParse("00000000-0000-0000-0000-000000000006"),
-			expected: n2,
+			expected: n1,
 		},
 		{
 			name:    "Empty ring",
