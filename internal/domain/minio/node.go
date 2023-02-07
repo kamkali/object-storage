@@ -7,12 +7,10 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"golang.org/x/net/context"
-	"time"
 )
 
 const (
 	bucketName = "object-storage"
-	// TODO: can be dynamic perhaps
 )
 
 type Node struct {
@@ -33,9 +31,7 @@ func NewNode(endpoint string, accessKeyID string, secretAccessKey string) (*Node
 		c:  minioClient,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	if err := n.createBucket(ctx); err != nil {
+	if err := n.createBucket(context.Background()); err != nil {
 		return nil, fmt.Errorf("create bucket: %w", err)
 	}
 
@@ -44,26 +40,12 @@ func NewNode(endpoint string, accessKeyID string, secretAccessKey string) (*Node
 
 func (n *Node) createBucket(ctx context.Context) error {
 	if err := n.c.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{}); err != nil {
-		exists, errBucketExists := n.c.BucketExists(ctx, bucketName)
-		if errBucketExists == nil && exists {
-			return nil
-		} else {
+		exists, err := n.c.BucketExists(ctx, bucketName)
+		if err != nil && !exists {
 			return err
 		}
 	}
 	return nil
-}
-
-func (n *Node) ID() uuid.UUID {
-	return n.id
-}
-
-func (n *Node) Addr(ctx context.Context) string {
-	return n.c.EndpointURL().String()
-}
-
-func (n *Node) IsAlive(ctx context.Context) bool {
-	return n.c.IsOnline()
 }
 
 func (n *Node) PutObject(ctx context.Context, o *domain.Object) error {
@@ -89,4 +71,16 @@ func (n *Node) GetObject(ctx context.Context, id uuid.UUID) (*domain.Object, err
 		Content: object,
 		Size:    s.Size,
 	}, nil
+}
+
+func (n *Node) ID() uuid.UUID {
+	return n.id
+}
+
+func (n *Node) Addr(ctx context.Context) string {
+	return n.c.EndpointURL().String()
+}
+
+func (n *Node) IsAlive(ctx context.Context) bool {
+	return n.c.IsOnline()
 }
