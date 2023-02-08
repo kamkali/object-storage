@@ -21,7 +21,7 @@ func NewStorage(manager domain.NodeManager) *StorageService {
 	}
 }
 
-func (s StorageService) PutObject(ctx context.Context, o *domain.Object) error {
+func (s *StorageService) PutObject(ctx context.Context, o *domain.Object) error {
 	if !idRe.Match([]byte(o.ID)) {
 		return domain.ErrInvalidID
 	}
@@ -38,7 +38,7 @@ func (s StorageService) PutObject(ctx context.Context, o *domain.Object) error {
 	return node.PutObject(ctx, o)
 }
 
-func (s StorageService) GetObject(ctx context.Context, key string) (*domain.Object, error) {
+func (s *StorageService) GetObject(ctx context.Context, key string) (*domain.Object, error) {
 	if !idRe.Match([]byte(key)) {
 		return nil, domain.ErrInvalidID
 	}

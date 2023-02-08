@@ -13,5 +13,5 @@ type ServerError struct {
 }
 
 type PutObjectResponse struct {
-	ID string
+	ID string `json:"id,omitempty"`
 }

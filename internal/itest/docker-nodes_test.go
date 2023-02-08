@@ -3,17 +3,18 @@ package itest
 import (
 	"context"
 	"fmt"
-	"github.com/kamkalis/object-storage/internal/domain"
-	"github.com/kamkalis/object-storage/internal/domain/docker"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 	"io"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/kamkalis/object-storage/internal/domain"
+	"github.com/kamkalis/object-storage/internal/domain/docker"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Discoverer and use Minio nodes", Ordered, func() {
+var _ = Describe("Discover and use Minio nodes", Ordered, func() {
 	var (
 		nodes   []domain.StorageNode
 		timeout = 30 * time.Second

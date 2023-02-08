@@ -13,8 +13,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// NodeDiscoverer can discover storage nodes and map them to concrete nodes
-type NodeDiscoverer struct {
+// Discoverer can discover storage nodes and map them to concrete nodes
+type Discoverer struct {
 	nodeIdentifier    string
 	networkIdentifier string
 	nodePort          string
@@ -28,13 +28,13 @@ const (
 	EnvKeyMinioSecretKey = "MINIO_SECRET_KEY"
 )
 
-func NewNodeDiscoverer(nodeID, nodePort, networkID string) (*NodeDiscoverer, error) {
+func NewNodeDiscoverer(nodeID, nodePort, networkID string) (*Discoverer, error) {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return nil, fmt.Errorf("new docker client: %w", err)
 	}
 
-	return &NodeDiscoverer{
+	return &Discoverer{
 		c:                 cli,
 		nodeIdentifier:    nodeID,
 		nodePort:          nodePort,
@@ -42,7 +42,7 @@ func NewNodeDiscoverer(nodeID, nodePort, networkID string) (*NodeDiscoverer, err
 	}, nil
 }
 
-func (n *NodeDiscoverer) DiscoverNodes(ctx context.Context) ([]domain.StorageNode, error) {
+func (n *Discoverer) DiscoverNodes(ctx context.Context) ([]domain.StorageNode, error) {
 	containers, err := n.c.ContainerList(ctx, types.ContainerListOptions{
 		Filters: filters.NewArgs(filters.Arg("name", n.nodeIdentifier)),
 	})
@@ -62,7 +62,7 @@ func (n *NodeDiscoverer) DiscoverNodes(ctx context.Context) ([]domain.StorageNod
 	return domainNodes, nil
 }
 
-func (n *NodeDiscoverer) toDomainNode(ctx context.Context, c types.Container) (domain.StorageNode, error) {
+func (n *Discoverer) toDomainNode(ctx context.Context, c types.Container) (domain.StorageNode, error) {
 	switch c.Image {
 	case ImageMinio:
 		return n.mapToMinioNode(ctx, c)
@@ -71,7 +71,7 @@ func (n *NodeDiscoverer) toDomainNode(ctx context.Context, c types.Container) (d
 	}
 }
 
-func (n *NodeDiscoverer) mapToMinioNode(ctx context.Context, container types.Container) (domain.StorageNode, error) {
+func (n *Discoverer) mapToMinioNode(ctx context.Context, container types.Container) (domain.StorageNode, error) {
 	c, err := n.c.ContainerInspect(ctx, container.ID)
 	if err != nil {
 		return nil, fmt.Errorf("inspect container id=%s: %w", c.ID, err)
