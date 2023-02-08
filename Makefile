@@ -7,6 +7,9 @@ compose-debug:
 compose:
 	docker compose up --build
 
+clean:
+	docker compose down
+
 tools:
 	cat tools.go | grep _ | grep \".*\" -o | xargs -tI % go install %
 
@@ -15,6 +18,10 @@ generate:
 
 test:
 	go test -short -race ./...
+
+itest:
+	docker-compose -f ./docker-compose.test.yml up --build
+
 
 lint:
 	golangci-lint run ./...
@@ -27,4 +34,4 @@ fmt-imports:
 
 format: fmt-code fmt-imports
 
-.PHONY: build-container compose tools generate lint format
+.PHONY: build-container compose tools generate lint format clean

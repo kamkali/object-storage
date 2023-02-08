@@ -1,0 +1,4 @@
+FROM golang:1.19
+WORKDIR testdir
+COPY . .
+ENTRYPOINT ["go", "test", "-v", "./internal/itest >> itest.out"]
