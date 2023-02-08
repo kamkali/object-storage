@@ -13,6 +13,7 @@ const (
 	bucketName = "object-storage"
 )
 
+// Node implements StorageNode for a MinIO
 type Node struct {
 	id string
 	c  *minio.Client

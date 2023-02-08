@@ -13,6 +13,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// NodeDiscoverer can discover storage nodes and map them to concrete nodes
 type NodeDiscoverer struct {
 	nodeIdentifier    string
 	networkIdentifier string
