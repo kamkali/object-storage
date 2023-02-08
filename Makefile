@@ -1,10 +1,4 @@
-build-container:
-	docker build -t object-storage:latest .
-
-compose-debug:
-	docker compose -f docker-compose-debug.yml up --build
-
-compose:
+run:
 	docker compose up --build
 
 clean:
@@ -22,7 +16,6 @@ test:
 itest:
 	docker-compose -f ./docker-compose.test.yml up --build
 
-
 lint:
 	golangci-lint run ./...
 
@@ -34,4 +27,4 @@ fmt-imports:
 
 format: fmt-code fmt-imports
 
-.PHONY: build-container compose tools generate lint format clean
+.PHONY: run clean tools generate test itest lint format

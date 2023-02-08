@@ -31,6 +31,23 @@ func (a *app) initConfig() {
 	a.config = c
 }
 
+func (a *app) initManager() {
+	lb := consistenthash.NewRingLoadBalancer()
+	discoverer, err := docker.NewNodeDiscoverer(
+		a.config.StorageCluster.NodeIdentifier,
+		a.config.StorageCluster.NodeAPIPort,
+		a.config.StorageCluster.NetworkIdentifier,
+	)
+	if err != nil {
+		log.Fatalf("cannot init node discoverer: %v", err)
+	}
+	a.manager = manager.NewStorageManager(lb, discoverer)
+}
+
+func (a *app) initStorageService() {
+	a.storageService = service.NewStorage(a.manager)
+}
+
 func (a *app) initApp() {
 	a.initConfig()
 	a.initManager()
@@ -56,21 +73,10 @@ func (a *app) start() {
 	a.server.Start()
 }
 
-func (a *app) initStorageService() {
-	a.storageService = service.NewStorage(a.manager)
-}
-
-func (a *app) initManager() {
-	lb := consistenthash.NewRingLoadBalancer()
-	discoverer, err := docker.NewNodeDiscoverer(
-		a.config.StorageCluster.NodeIdentifier,
-		a.config.StorageCluster.NodeAPIPort,
-		a.config.StorageCluster.NetworkIdentifier,
-	)
-	if err != nil {
-		log.Fatalf("cannot init node discoverer: %v", err)
-	}
-	a.manager = manager.NewStorageManager(lb, discoverer)
+func Run() {
+	a := app{}
+	a.initApp()
+	a.start()
 }
 
 func (a *app) refreshJob(ctx context.Context, ticker *time.Ticker) {
@@ -85,10 +91,4 @@ func (a *app) refreshJob(ctx context.Context, ticker *time.Ticker) {
 			return
 		}
 	}
-}
-
-func Run() {
-	a := app{}
-	a.initApp()
-	a.start()
 }
