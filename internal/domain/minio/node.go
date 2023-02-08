@@ -18,7 +18,7 @@ type Node struct {
 	c  *minio.Client
 }
 
-func NewNode(id string, endpoint string, accessKeyID string, secretAccessKey string) (*Node, error) {
+func NewNode(id, endpoint, accessKeyID, secretAccessKey string) (*Node, error) {
 	minioClient, err := minio.New(endpoint, &minio.Options{
 		Creds: credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 	})
@@ -31,14 +31,14 @@ func NewNode(id string, endpoint string, accessKeyID string, secretAccessKey str
 		c:  minioClient,
 	}
 
-	if err := n.createBucket(context.Background()); err != nil {
+	if err := n.createStorage(context.Background()); err != nil {
 		return nil, fmt.Errorf("create bucket: %w", err)
 	}
 
 	return n, nil
 }
 
-func (n *Node) createBucket(ctx context.Context) error {
+func (n *Node) createStorage(ctx context.Context) error {
 	if err := n.c.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{}); err != nil {
 		exists, err := n.c.BucketExists(ctx, bucketName)
 		if err != nil && !exists {

@@ -5,5 +5,3 @@ import (
 )
 
 var _ domain.StorageNode = (*Node)(nil)
-
-// TODO: integration test maybe

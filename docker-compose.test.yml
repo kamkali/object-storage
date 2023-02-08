@@ -1,0 +1,58 @@
+version: "3.7"
+
+services:
+  test-object-storage-node-1: &object-storage-node
+    image: minio/minio
+    command: server --console-address ":9001" /tmp/data
+    ports: [ "9001:9001" ] # You can open localhost:9001 in your browser to debug what objects are on this node.
+    networks:
+      test-object-storage:
+        # Don't copy those addresses in your application. Use the local docker socket to get them.
+        ipv4_address: 169.253.1.2
+    environment:
+      # Same for the environment variables, use the local docker socket to read it.
+      - MINIO_ACCESS_KEY=ring
+      - MINIO_SECRET_KEY=treepotato
+
+  test-object-storage-node-2:
+    <<: *object-storage-node
+    ports: [ "9002:9001" ] # You can open localhost:9002 in your browser to debug what objects are on this node.
+    networks:
+      test-object-storage:
+        ipv4_address: 169.253.1.3
+    environment:
+      - MINIO_ACCESS_KEY=maglev
+      - MINIO_SECRET_KEY=baconpapaya
+
+  test-object-storage-node-3:
+    <<: *object-storage-node
+    ports: [ "9003:9001" ] # You can open localhost:9003 in your browser to debug what objects are on this node.
+    networks:
+      test-object-storage:
+        ipv4_address: 169.253.1.4
+    environment:
+      - MINIO_ACCESS_KEY=rendezvous
+      - MINIO_SECRET_KEY=bluegreen
+
+  gateway-container:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      - test-object-storage-node-1
+      - test-object-storage-node-2
+      - test-object-storage-node-3
+    networks:
+      test-object-storage:
+        ipv4_address: 169.253.1.5
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/go/testdir
+
+networks:
+  test-object-storage:
+    ipam:
+      driver: default
+      config:
+        - subnet: 169.253.1.0/24
+          gateway: 169.253.1.1
