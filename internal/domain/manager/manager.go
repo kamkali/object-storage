@@ -7,6 +7,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// StorageManager handles storage nodes refreshment — it discovers new nodes and handle them to the LoadBalancer
 type StorageManager struct {
 	domain.LoadBalancer
 	domain.NodeDiscoverer

@@ -10,6 +10,7 @@ import (
 
 var idRe = regexp.MustCompile(`^[a-zA-Z0-9]{1,32}$`)
 
+// StorageService handles and validates requests
 type StorageService struct {
 	manager domain.NodeManager
 }
